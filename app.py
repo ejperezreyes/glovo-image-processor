@@ -97,25 +97,32 @@ def get_pending_jobs():
         app.logger.error(f"Error getting pending jobs: {str(e)}")
         return jsonify({"error": str(e)}), 500
 
-@app.route('/api/n8n/start-job/<job_id>', methods=['POST'])
+@app.route('/api/n8n/start-job/<job_id>', methods=['GET', 'POST'])
 def start_job(job_id):
     """
     Endpoint para n8n: marcar un trabajo como iniciado
     
-    Body: {
+    GET: /api/n8n/start-job/{job_id}?webhook_url=https://...
+    POST Body: {
         "webhook_url": "https://n8n.example.com/webhook/result/job_123"
     }
     """
     try:
-        data = request.get_json()
-        webhook_url = data.get('webhook_url') if data else None
+        # Soportar tanto GET como POST
+        if request.method == 'GET':
+            webhook_url = request.args.get('webhook_url', '')
+        else:
+            data = request.get_json()
+            webhook_url = data.get('webhook_url') if data else ''
         
-        processor.mark_job_processing(job_id, webhook_url or "")
+        processor.mark_job_processing(job_id, webhook_url)
         
         return jsonify({
             "success": True,
             "job_id": job_id,
-            "status": "processing"
+            "status": "processing",
+            "method": request.method,
+            "webhook_url": webhook_url
         }), 200
         
     except Exception as e:
