@@ -1,12 +1,14 @@
-# Use Python 3.9 slim image (más liviano)
+# Use Python 3.9 slim image
 FROM python:3.9-slim
 
 # Set working directory
 WORKDIR /app
 
-# Install only essential system dependencies (sin PostgreSQL)
+# Install system dependencies for PostgreSQL (optimized)
 RUN apt-get update && apt-get install -y \
     gcc \
+    libpq-dev \
+    --no-install-recommends \
     && rm -rf /var/lib/apt/lists/* \
     && apt-get clean
 

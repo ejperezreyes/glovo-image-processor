@@ -40,10 +40,21 @@ class GlovoImageProcessor:
         self.scraper = GlovoScraperImproved()
         self._init_database()
     
+    def _get_connection(self):
+        """Get database connection (PostgreSQL or SQLite)"""
+        try:
+            # Try to import config for production
+            from config import get_db_connection
+            return get_db_connection()
+        except:
+            # Fallback to SQLite for development
+            import sqlite3
+            return sqlite3.connect(self.db_path)
+    
     def _init_database(self):
         """Inicializa las tablas adicionales para el procesamiento"""
         try:
-            conn = sqlite3.connect(self.db_path)
+            conn = self._get_connection()
             cursor = conn.cursor()
             
             # Tabla para trabajos de procesamiento de imágenes
@@ -138,7 +149,7 @@ class GlovoImageProcessor:
     def _check_existing_restaurant(self, restaurant_url: str) -> Optional[Dict]:
         """Verifica si el restaurante ya existe en la BD"""
         try:
-            conn = sqlite3.connect(self.db_path)
+            conn = self._get_connection()
             cursor = conn.cursor()
             
             cursor.execute('''
@@ -176,7 +187,7 @@ class GlovoImageProcessor:
     def _create_image_processing_jobs(self, restaurant_url: str, request_id: str) -> List[ImageProcessingJob]:
         """Crea trabajos de procesamiento para todas las imágenes del restaurante"""
         try:
-            conn = sqlite3.connect(self.db_path)
+            conn = self._get_connection()
             cursor = conn.cursor()
             
             # Obtener productos con imágenes
@@ -219,7 +230,7 @@ class GlovoImageProcessor:
     def _save_image_job(self, job: ImageProcessingJob):
         """Guarda un trabajo de procesamiento en la BD"""
         try:
-            conn = sqlite3.connect(self.db_path)
+            conn = self._get_connection()
             cursor = conn.cursor()
             
             cursor.execute('''
@@ -243,7 +254,7 @@ class GlovoImageProcessor:
     def _register_user_request(self, request_id: str, restaurant_url: str, user_email: str, total_images: int):
         """Registra la solicitud del usuario"""
         try:
-            conn = sqlite3.connect(self.db_path)
+            conn = self._get_connection()
             cursor = conn.cursor()
             
             cursor.execute('''
@@ -261,7 +272,7 @@ class GlovoImageProcessor:
     def get_pending_jobs_for_n8n(self, limit: int = 10) -> List[Dict]:
         """Obtiene trabajos pendientes para enviar a n8n"""
         try:
-            conn = sqlite3.connect(self.db_path)
+            conn = self._get_connection()
             cursor = conn.cursor()
             
             cursor.execute('''
@@ -294,7 +305,7 @@ class GlovoImageProcessor:
     def mark_job_processing(self, job_id: str, n8n_webhook_url: str):
         """Marca un trabajo como en procesamiento"""
         try:
-            conn = sqlite3.connect(self.db_path)
+            conn = self._get_connection()
             cursor = conn.cursor()
             
             cursor.execute('''
@@ -312,7 +323,7 @@ class GlovoImageProcessor:
     def complete_job(self, job_id: str, processed_image_url: str, watermarked_image_url: str):
         """Completa un trabajo de procesamiento"""
         try:
-            conn = sqlite3.connect(self.db_path)
+            conn = self._get_connection()
             cursor = conn.cursor()
             
             cursor.execute('''
@@ -332,7 +343,7 @@ class GlovoImageProcessor:
     def get_request_status(self, request_id: str) -> Dict:
         """Obtiene el estado de una solicitud"""
         try:
-            conn = sqlite3.connect(self.db_path)
+            conn = self._get_connection()
             cursor = conn.cursor()
             
             # Obtener info de la solicitud

@@ -5,10 +5,9 @@ class Config:
     # Database configuration
     DATABASE_URL = os.getenv('DATABASE_URL')
     
-    # Usar SQLite por defecto para simplificar deployment
-    # PostgreSQL se puede añadir después si es necesario
+    # En Railway, PostgreSQL se provee automáticamente
     if DATABASE_URL and 'postgresql' in DATABASE_URL:
-        # Producción: PostgreSQL (solo si está configurado)
+        # Producción: PostgreSQL
         try:
             url = urlparse(DATABASE_URL)
             DB_CONFIG = {
@@ -19,14 +18,15 @@ class Config:
                 'password': url.password,
                 'type': 'postgresql'
             }
-        except:
+        except Exception as e:
             # Fallback a SQLite si hay problemas
+            print(f"Warning: PostgreSQL config failed, using SQLite: {e}")
             DB_CONFIG = {
                 'path': 'glovo_products.db',
                 'type': 'sqlite'
             }
     else:
-        # Por defecto: SQLite (development y producción inicial)
+        # Desarrollo: SQLite
         DB_CONFIG = {
             'path': 'glovo_products.db',
             'type': 'sqlite'
@@ -52,14 +52,19 @@ class Config:
 # Helper function to get database connection
 def get_db_connection():
     if Config.DB_CONFIG['type'] == 'postgresql':
-        import psycopg2
-        return psycopg2.connect(
-            host=Config.DB_CONFIG['host'],
-            port=Config.DB_CONFIG['port'],
-            database=Config.DB_CONFIG['database'],
-            user=Config.DB_CONFIG['user'],
-            password=Config.DB_CONFIG['password']
-        )
+        try:
+            import psycopg2
+            return psycopg2.connect(
+                host=Config.DB_CONFIG['host'],
+                port=Config.DB_CONFIG['port'],
+                database=Config.DB_CONFIG['database'],
+                user=Config.DB_CONFIG['user'],
+                password=Config.DB_CONFIG['password']
+            )
+        except Exception as e:
+            print(f"PostgreSQL connection failed, falling back to SQLite: {e}")
+            import sqlite3
+            return sqlite3.connect('glovo_products.db')
     else:
         import sqlite3
         return sqlite3.connect(Config.DB_CONFIG['path'])
