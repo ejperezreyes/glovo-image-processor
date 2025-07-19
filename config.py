@@ -5,20 +5,28 @@ class Config:
     # Database configuration
     DATABASE_URL = os.getenv('DATABASE_URL')
     
-    # En Railway, PostgreSQL se provee automáticamente
-    if DATABASE_URL:
-        # Producción: PostgreSQL
-        url = urlparse(DATABASE_URL)
-        DB_CONFIG = {
-            'host': url.hostname,
-            'port': url.port,
-            'database': url.path[1:],  # Remove leading slash
-            'user': url.username,
-            'password': url.password,
-            'type': 'postgresql'
-        }
+    # Usar SQLite por defecto para simplificar deployment
+    # PostgreSQL se puede añadir después si es necesario
+    if DATABASE_URL and 'postgresql' in DATABASE_URL:
+        # Producción: PostgreSQL (solo si está configurado)
+        try:
+            url = urlparse(DATABASE_URL)
+            DB_CONFIG = {
+                'host': url.hostname,
+                'port': url.port,
+                'database': url.path[1:],  # Remove leading slash
+                'user': url.username,
+                'password': url.password,
+                'type': 'postgresql'
+            }
+        except:
+            # Fallback a SQLite si hay problemas
+            DB_CONFIG = {
+                'path': 'glovo_products.db',
+                'type': 'sqlite'
+            }
     else:
-        # Desarrollo: SQLite
+        # Por defecto: SQLite (development y producción inicial)
         DB_CONFIG = {
             'path': 'glovo_products.db',
             'type': 'sqlite'
