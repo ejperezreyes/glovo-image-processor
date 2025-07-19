@@ -3,51 +3,65 @@ __pycache__/
 *.py[cod]
 *$py.class
 *.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
 venv/
 env/
 ENV/
+env.bak/
+venv.bak/
 
 # IDE
-.vscode/
 .idea/
+.vscode/
 *.swp
 *.swo
+*~
 
 # OS
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
 
-# Database (local development only)
-*.db
-*.sqlite3
+# Project specific
+glovo_products.db
+debug_*.html
+debug_*.txt
+glovo_restaurant_images/
+glovo_images/
+
+# Environment variables
+.env
+.env.local
+.env.production
 
 # Logs
 *.log
+logs/
 
-# Environment variables (contains secrets)
-.env
-
-# Uploads (local files)
-uploads/
-temp/
-
-# Build artifacts
-build/
-dist/
-*.egg-info/
-
-# Coverage reports
-htmlcov/
-.coverage
-.pytest_cache/
-
-# Node modules (if using npm/yarn)
-node_modules/
-
-# Images (too large for git)
-glovo_images/
-glovo_restaurant_images/
-
-# Debug files
-debug_*.html
-debug_*.txt 
+# Temporary files
+tmp/
+temp/ 

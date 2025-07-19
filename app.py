@@ -18,11 +18,11 @@ app.config.from_object(Config)
 
 # Initialize processor with database configuration
 if is_production():
-    # Production: Use PostgreSQL with config
-    processor = GlovoImageProcessor()
+    # Production: Use PostgreSQL
+    processor = GlovoImageProcessor(db_type='postgresql')
 else:
     # Development: Use SQLite
-    processor = GlovoImageProcessor()
+    processor = GlovoImageProcessor(db_type='sqlite')
 
 # Simulación de datos de usuario (en producción usar una BD real)
 USERS = {
@@ -113,7 +113,7 @@ def start_job(job_id):
     """
     try:
         data = request.get_json()
-        webhook_url = data.get('webhook_url') if data else ""
+        webhook_url = data.get('webhook_url') if data else None
         
         processor.mark_job_processing(job_id, webhook_url)
         
@@ -176,8 +176,7 @@ def download_images(request_id):
         image_type = request.args.get('type', 'watermarked')
         
         # Obtener URLs de imágenes completadas
-        download_data = processor.generate_download_package(request_id, image_type == 'watermarked')
-        images = download_data.get('images', [])
+        images = processor.get_completed_images(request_id, image_type)
         
         if not images:
             return jsonify({"error": "No hay imágenes disponibles"}), 404
@@ -216,14 +215,7 @@ def process_payment():
         # Simular procesamiento de pago exitoso
         # En producción: validar con Stripe, PayPal, etc.
         
-        # TODO: Implementar procesamiento real de pagos
-        result = {
-            "success": True,
-            "request_id": request_id,
-            "payment_token": payment_token,
-            "message": "Pago procesado exitosamente (simulado)",
-            "watermark_removal": True
-        }
+        result = processor.process_payment(request_id, payment_token)
         
         return jsonify(result), 200
         
