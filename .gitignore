@@ -1,0 +1,53 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Database (local development only)
+*.db
+*.sqlite3
+
+# Logs
+*.log
+
+# Environment variables (contains secrets)
+.env
+
+# Uploads (local files)
+uploads/
+temp/
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+
+# Coverage reports
+htmlcov/
+.coverage
+.pytest_cache/
+
+# Node modules (if using npm/yarn)
+node_modules/
+
+# Images (too large for git)
+glovo_images/
+glovo_restaurant_images/
+
+# Debug files
+debug_*.html
+debug_*.txt 
